@@ -6,6 +6,6 @@ class Message():
     def __init__(self):
         pass
 
-    def send():
+    def send(self):
         '''Envia as mensagens para o intermediário da comunicação'''
         pass
