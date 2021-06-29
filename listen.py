@@ -26,9 +26,10 @@ credentials = get_credentials()
 
 # Seta um usuário e senha para o Broker, se não tem, não use esta linha
 client.username_pw_set(credentials[0], password=credentials[1])
+client.username_pw_set("animon_terminal", password="cVNy%mi8h2^78C!U")
 
 # Conecta no MQTT Broker, no meu caso, o Mosquitto
-client.connect(credentials[2], 1883, 60)
+client.connect("iot.sj.ifsc.edu.br", 1883, 60)
 
 # Inicia o loop
 client.loop_forever()
