@@ -1,12 +1,13 @@
 # PARA OUVIR UM TÓPICO
 
 # Para instalar o paho-mqtt use o comando pip install paho-mqtt
+import string
 import paho.mqtt.client as mqtt
 
 def get_credentials():
-    ref_arquivo = open("credentials.txt","r")
+    ref_arquivo = open("credentials.txt","r") 
     return ref_arquivo.readlines()
-
+    
 # The callback for when the client receives a CONNACK response from the server.
 def on_connect(client, userdata, flags, rc):
   
@@ -25,10 +26,10 @@ client.on_message = on_message
 credentials = get_credentials()
 
 # Seta um usuário e senha para o Broker, se não tem, não use esta linha
-client.username_pw_set(credentials[0], password=credentials[1])
+client.username_pw_set(credentials[0].rstrip('\n'), password=credentials[1].rstrip('\n'))
 
 # Conecta no MQTT Broker, no meu caso, o Mosquitto
-client.connect(credentials[2], 1883, 60)
+client.connect(credentials[2].rstrip('\n'), 1883, 60)
 
 # Inicia o loop
 client.loop_forever()

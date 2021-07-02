@@ -5,10 +5,10 @@ from Message import Message
 
 class MQTTClient(Message):
 
-    def __init__(self, hostname, username, password, topic="animon/#"):
+    def __init__(self, hostname, username, password, topic="animon/identification"):
         self.hostname = hostname
         self.auth = {'username':username, 'password':password}
         self.topic = topic
 
-    def send(self):
-        publish.single(self.topic, "Oi, aqui é um teste", hostname=self.hostname)
+    def send(self, msg):
+        publish.single(self.topic, msg, hostname=self.hostname, auth=self.auth)
