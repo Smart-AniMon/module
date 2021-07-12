@@ -3,7 +3,13 @@
 from MQTTClient import MQTTClient
 from threading import Timer
 from Camera import Camera
+import json
 
+# texto = '{"atributo1": "valor 1", "atributo2": 23}'
+# objeto = json.loads(texto)
+# print(objeto['atributo1'])
+
+json_msg = '{"id":"testID","image":"testIMAGE","temperature":"testTEMPER","humidity":"testHUMID","localization":{"latitude":"testLAT","longitude":"testLONG"},"capture_date":"testDATE"}'
 
 class Controller():
 
@@ -21,11 +27,18 @@ class Controller():
     def identify(self):
         caminho = Camera.get_value(self.id_camera, "./images/image"+str(self.count)+".png")
         print(str(self.count)+" - PHOTOGRAPH: "+caminho)
-        self.messenger.send("broker "+str(self.count))
         
         # 1. transformar imagem em bytes
+
+
         # 2. adicionar num objeto json
+        parsed_json = json.loads(json_msg)
+        parsed_json['id'] = str(self.count)
+        
+        
         # 3. enviar para o broker
+        self.messenger.send(json.dumps(parsed_json))
+        
 
         self.count += 1
         self.run()
