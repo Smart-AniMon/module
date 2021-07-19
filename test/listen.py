@@ -5,7 +5,7 @@ import string
 import paho.mqtt.client as mqtt
 
 def get_credentials():
-    ref_arquivo = open("credentials.txt","r") 
+    ref_arquivo = open("../credentials.txt","r") 
     return ref_arquivo.readlines()
     
 # The callback for when the client receives a CONNACK response from the server.

@@ -4,6 +4,8 @@ from MQTTClient import MQTTClient
 from threading import Timer
 from Camera import Camera
 import json
+import base64
+import datetime
 
 # texto = '{"atributo1": "valor 1", "atributo2": 23}'
 # objeto = json.loads(texto)
@@ -23,25 +25,37 @@ class Controller():
     def run(self):
         self.timer = Timer(self.t, self.identify)
         self.timer.start()
-
-    def identify(self):
-        caminho = Camera.get_value(self.id_camera, "./images/image"+str(self.count)+".png")
-        print(str(self.count)+" - PHOTOGRAPH: "+caminho)
-        
-        # 1. transformar imagem em bytes
-
-
-        # 2. adicionar num objeto json
+    
+    def convert_image_base64(self, path):
+        image = open(path,'rb')
+        image_bytes = image.read()
+        image_base64 = base64.b64encode(image_bytes)
+        return image_base64
+    
+    def build_message(self, image_base64):
         parsed_json = json.loads(json_msg)
         parsed_json['id'] = str(self.count)
-        
-        
-        # 3. enviar para o broker
-        self.messenger.send(json.dumps(parsed_json))
-        
+        parsed_json['image'] = image_base64.decode('utf-8')
+        parsed_json['capture_date'] = str(datetime.datetime.now())
+        string_json = json.dumps(parsed_json)
+        return string_json
 
-        self.count += 1
-        self.run()
+    def identify(self):
+
+        image_path  ="./images/image"+str(self.count)+".png"
+        is_captured = Camera.get_value(self.id_camera, image_path)
+        
+        if is_captured:
+            print(str(self.count)+" - PHOTOGRAPH")
+            
+            image_base64 = self.convert_image_base64(image_path)
+            message = self.build_message(image_base64)
+            self.messenger.send(message)
+
+            self.count += 1
+            self.run()
+        else:
+            print("STOP: Image capture failed")
 
 def get_credentials():
     ref_arquivo = open("credentials.txt","r") 
@@ -58,7 +72,7 @@ if __name__ == "__main__":
     
     mqtt = MQTTClient(hostname, username, password, topic)
 
-    controller = Controller(1, 0, mqtt) # t_period (mudar para 60 segundos), id_camera (0: camNotebook, 2: camUSB)
+    controller = Controller(5, 0, mqtt) # t_period (mudar para 60 segundos), id_camera (0: camNotebook, 2: camUSB)
     
     controller.run()
     print("Run")

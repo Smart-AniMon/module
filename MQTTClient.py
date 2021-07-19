@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 
 import paho.mqtt.publish as publish
-from Message import Message
+from Messager import Messager
 
-class MQTTClient(Message):
+class MQTTClient(Messager):
 
     def __init__(self, hostname, username, password, topic="animon/identification"):
         self.hostname = hostname

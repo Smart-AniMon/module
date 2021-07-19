@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 '''Interface para troca de mensagens'''
-class Message():
+class Messager():
 
     def __init__(self):
         pass
