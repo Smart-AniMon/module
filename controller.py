@@ -15,12 +15,13 @@ json_msg = '{"id":"testID","image":"testIMAGE","temperature":"testTEMPER","humid
 
 class Controller():
 
-    def __init__(self, t_period, id_camera, messenger):
+    def __init__(self, t_period, id_camera, messenger, images_directory):
         self.t = t_period
         self.timer = None
         self.count = 0
         self.id_camera = id_camera
         self.messenger = messenger
+        self.images_directory = images_directory
 
     def run(self):
         self.timer = Timer(self.t, self.identify)
@@ -42,7 +43,7 @@ class Controller():
 
     def identify(self):
 
-        image_path  ="./images/image"+str(self.count)+".png"
+        image_path  =self.images_directory+str(self.count)+".png"
         is_captured = Camera.get_value(self.id_camera, image_path)
         
         if is_captured:
@@ -72,7 +73,7 @@ if __name__ == "__main__":
     
     mqtt = MQTTClient(hostname, username, password, topic)
 
-    controller = Controller(5, 0, mqtt) # t_period (mudar para 60 segundos), id_camera (0: camNotebook, 2: camUSB)
+    controller = Controller(5, 0, mqtt, "./images/image") # t_period (mudar para 60 segundos), id_camera (0: camNotebook, 2: camUSB)
     
     controller.run()
     print("Run")
