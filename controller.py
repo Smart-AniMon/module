@@ -3,6 +3,7 @@
 from MQTTClient import MQTTClient
 from threading import Timer
 from Camera import Camera
+from HumidityTemperature import HumidityTemperature
 import json
 import base64
 import datetime
@@ -22,6 +23,7 @@ class Controller():
         self.id_camera = id_camera
         self.messenger = messenger
         self.images_directory = images_directory
+        self.humidity_temperature = HumidityTemperature(25)
 
     def run(self):
         self.timer = Timer(self.t, self.identify)
@@ -33,10 +35,12 @@ class Controller():
         image_base64 = base64.b64encode(image_bytes)
         return image_base64
     
-    def build_message(self, image_base64):
+    def build_message(self, image_base64, humidity, temperature):
         parsed_json = json.loads(json_msg)
         parsed_json['id'] = str(self.count)
         parsed_json['image'] = image_base64.decode('utf-8')
+        parsed_json['humidity'] = str(humidity)
+        parsed_json['temperature'] = str(temperature)
         parsed_json['capture_date'] = str(datetime.datetime.now())
         string_json = json.dumps(parsed_json)
         return string_json
@@ -45,12 +49,16 @@ class Controller():
 
         image_path  =self.images_directory+str(self.count)+".png"
         is_captured = Camera.get_value(self.id_camera, image_path)
+
+        # TODO: tornar essa tarefa periodica para atualizar esses valores no obj self.humidity_temperature
+        #       e aqui faz um get da ultima atualizacao -> get_humidity() , get_temperature()
+        humidity, temperature = self.humidity_temperature.get_value() 
         
         if is_captured:
             print(str(self.count)+" - PHOTOGRAPH")
             
             image_base64 = self.convert_image_base64(image_path)
-            message = self.build_message(image_base64)
+            message = self.build_message(image_base64, humidity, temperature)
             self.messenger.send(message)
 
             self.count += 1
