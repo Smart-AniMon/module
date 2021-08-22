@@ -8,6 +8,14 @@ import json
 import base64
 import datetime
 
+# TODO: remover depois, usado para fim de análise de tempo de execução de cada parte do código
+import time
+
+import signal
+import sys
+import RPi.GPIO as GPIO
+
+
 # texto = '{"atributo1": "valor 1", "atributo2": 23}'
 # objeto = json.loads(texto)
 # print(objeto['atributo1'])
@@ -23,7 +31,7 @@ class Controller():
         self.id_camera = id_camera
         self.messenger = messenger
         self.images_directory = images_directory
-        self.humidity_temperature = HumidityTemperature(25)
+        self.humidity_temperature = HumidityTemperature(24)
 
     def run(self):
         self.timer = Timer(self.t, self.identify)
@@ -45,30 +53,42 @@ class Controller():
         string_json = json.dumps(parsed_json)
         return string_json
 
-    def identify(self):
+    def identify(self, value):
+
+        print(time.asctime()+ " - IDENTIFY!")
 
         image_path  =self.images_directory+str(self.count)+".png"
         is_captured = Camera.get_value(self.id_camera, image_path)
+        print(time.asctime()+ " - PHOTOGRAPH!")
 
         # TODO: tornar essa tarefa periodica para atualizar esses valores no obj self.humidity_temperature
         #       e aqui faz um get da ultima atualizacao -> get_humidity() , get_temperature()
         humidity, temperature = self.humidity_temperature.get_value() 
+        print("humid : "+str(humidity)+" -- temp : "+str(temperature))
+        print(time.asctime()+ " - HUMIDITY AND TEMPERATURE!")
         
         if is_captured:
-            print(str(self.count)+" - PHOTOGRAPH")
+            print(time.asctime()+ " - "+str(self.count)+" - PHOTOGRAPH")
             
             image_base64 = self.convert_image_base64(image_path)
+            print(time.asctime()+ " - image_base64")
             message = self.build_message(image_base64, humidity, temperature)
+            print(time.asctime()+ " - build_message")
             self.messenger.send(message)
+            print(time.asctime()+ " - send")
 
             self.count += 1
-            self.run()
+            # self.run()
         else:
             print("STOP: Image capture failed")
 
 def get_credentials():
     ref_arquivo = open("credentials.txt","r") 
     return ref_arquivo.readlines()
+
+def signal_handler(sig, frame):
+    GPIO.cleanup()
+    sys.exit(0)
 
 if __name__ == "__main__":
     
@@ -81,7 +101,18 @@ if __name__ == "__main__":
     
     mqtt = MQTTClient(hostname, username, password, topic)
 
-    controller = Controller(5, 0, mqtt, "./images/image") # t_period (mudar para 60 segundos), id_camera (0: camNotebook, 2: camUSB)
+    # TODO: remover t_period
+    controller = Controller(5, 0, mqtt, "./images/image")
     
-    controller.run()
+    # controller.run()
+    # TODO: run da tarefa de captura de temperatura e umidade
+
+    BUTTON_GPIO = 23
+    GPIO.setmode(GPIO.BCM)
+    GPIO.setup(BUTTON_GPIO, GPIO.IN)
+    GPIO.add_event_detect(BUTTON_GPIO, GPIO.RISING, callback=controller.identify, bouncetime=100)
+    
     print("Run")
+
+    signal.signal(signal.SIGINT, signal_handler)
+    signal.pause()
