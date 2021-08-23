@@ -43,9 +43,6 @@ class Controller():
         parsed_json['capture_date'] = str(datetime.datetime.now())
         string_json = json.dumps(parsed_json)
         return string_json
-    
-    def debug(self, msg, code=""):
-        if DEBUG: print(str(datetime.datetime.now())+code+" - "+msg+RST)
 
     def photo_capture(self, image_path):
         was_captured = Camera.get_value(self.id_camera, image_path)
@@ -75,7 +72,7 @@ class Controller():
             debug("Message sent", GREEN)
             self.count += 1
         
-        debug("ERROR: Failed to capture image", RED)
+        else: debug("ERROR: Failed to capture image", RED)
 
 
 def get_credentials():
@@ -92,7 +89,11 @@ def signal_handler(sig, frame):
     sys.exit(0)
 
 def debug(msg, code=""):
-    print(str(datetime.datetime.now())+code+" - "+msg+RST)
+    if DEBUG: 
+        if code == RED:      sep = " X "
+        elif code == YELLOW: sep = " ! "
+        else :               sep = " - "
+        print(str(datetime.datetime.now())+code+sep+msg+RST)
 
 if __name__ == "__main__":
     
