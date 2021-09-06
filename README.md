@@ -70,10 +70,22 @@ topic
 $ mkdir images
 ~~~
 
+# MONTAGEM DOS COMPONENTES
+
+Realize a montagem dos componentes conforme o diagrama abaixo:
+
+![Diagrama de montagem do módulo](https://github.com/Smart-AniMon/docs/blob/main/images/module-connection-diagram.png)
+
+**CONFIGURE O SENSOR DE MOVIMENTO PIR HC-SR501**
+
+- Posicione a lente do sensor para cima e os dois trimpots virados para você.
+- Tempo (esquerdo): Gire o trimpot completamente no sentido anti horário para diminuir o tempo de saída alta após a detecção.
+- Sensibilidade (direito): Gire o trimpot completamente no sentido anti horário para diminuir o nível de sensibilidade (opcional).
+
 # INICIANDO O MÓDULO
 
 O módulo deve ser executado com _python3_. Para acompanhar a atividade do módulo execute no modo depuração adicionando o argumento _-D_ ou _--debug_:
 ~~~
-$ python3 controller.py -D
+$ python3 ~/module/controller.py -D
 ~~~
 A mensagem **Run** indica que o módulo está operando. 
