@@ -74,7 +74,7 @@ $ mkdir images
 
 Realize a montagem dos componentes conforme o diagrama abaixo:
 
-![Diagrama de montagem do módulo](https://github.com/Smart-AniMon/docs/blob/main/images/module-connection-diagram.png)
+<img src="https://github.com/Smart-AniMon/docs/blob/main/images/module-connection-diagram.png" alt="drawing" width="600"/>
 
 **CONFIGURE O SENSOR DE MOVIMENTO PIR HC-SR501**
 
